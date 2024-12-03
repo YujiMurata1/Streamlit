@@ -1,1 +1,53 @@
+import streamlit as st
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
 
+# Configurações da página
+st.set_page_config(page_title="Previsão do Preço do Petróleo", layout="centered")
+
+# Título do app
+st.title("Previsão do Preço do Petróleo")
+
+# Descrição
+st.write("""
+Este aplicativo permite que você selecione a quantidade de dias para gerar uma previsão fictícia do preço do petróleo.
+""")
+
+# Entrada do usuário
+dias_previsao = st.slider(
+    "Quantos dias você quer prever o preço do petróleo?", 
+    min_value=1, 
+    max_value=30, 
+    value=7, 
+    step=1
+)
+
+# Simulação de Previsão
+def gerar_previsao(dias):
+    # Simula dados fictícios de preço
+    hoje = datetime.today()
+    datas = [hoje + timedelta(days=i) for i in range(dias)]
+    precos = np.cumsum(np.random.randn(dias) * 2 + 80)  # Simulação de preços
+    return pd.DataFrame({"Data": datas, "Preço do Petróleo (USD)": precos})
+
+# Gerar dados
+dados_previsao = gerar_previsao(dias_previsao)
+
+# Exibir os dados em uma tabela
+st.write("### Previsão de Preços")
+st.dataframe(dados_previsao)
+
+# Exibir gráfico
+st.write("### Gráfico da Previsão")
+fig, ax = plt.subplots()
+ax.plot(dados_previsao["Data"], dados_previsao["Preço do Petróleo (USD)"], marker='o', linestyle='-')
+ax.set_title("Previsão do Preço do Petróleo")
+ax.set_xlabel("Data")
+ax.set_ylabel("Preço (USD)")
+plt.xticks(rotation=45)
+st.pyplot(fig)
+
+# Mensagem final
+st.success(f"Previsão gerada para {dias_previsao} dias!")
